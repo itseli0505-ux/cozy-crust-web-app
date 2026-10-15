@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Cozy Crust - Dashboard & Store</title>
+    <script src="https://tailwindcss.com"></script>
+    <script src="https://jsdelivr.net"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        sage: {
+                            50: '#f4f7f5',
+                            100: '#e6ede8',
+                            600: '#557a61',
+                            700: '#44624e',
+                            800: '#374f3f',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-sage-50 text-gray-800 font-sans min-h-screen">
+
+    <script>
+        const defaultState = {
+            currentUser: null,
+            currentModule: 'dashboard',
+            startupCapital: 1000.00,
+            products: [
+                { id: 'p1', name: 'Graham Nest (Classic)', batchYield: 100, batchCost: 885.00, costPerPiece: 8.85, sellingPrice: 12.00, stock: 100, lowStockThreshold: 20 },
+                { id: 'p2', name: 'Graham Nest (Flavored)', batchYield: 100, batchCost: 885.00, costPerPiece: 8.85, sellingPrice: 12.00, stock: 100, lowStockThreshold: 20 }
+            ],
+            inventory: [
+                { id: 'i1', item: 'Crushed Grahams', qty: '1 kg', cost: 235.00 },
+                { id: 'i2', item: 'Condensed Milk', qty: '2 Cans', cost: 110.00 },
+                { id: 'i3', item: 'Cocoa Powder', qty: '100g', cost: 115.00 },
+                { id: 'i4', item: 'Chocolate Filling', qty: '500g', cost: 120.00 },
+                { id: 'i5', item: 'Ube Filling', qty: '500g', cost: 120.00 },
+                { id: 'i6', item: 'Mango', qty: '1/4 kg', cost: 85.00 },
+                { id: 'i7', item: 'Packaging', qty: '100 pcs', cost: 100.00 }
+            ],
+            orders: [
+                { id: 'ORD-001', customerName: 'Juan Dela Cruz', type: 'Online', items: 'Graham Nest (Classic) x5', quantity: 5, total: 60.00, status: 'Pending', location: 'PRMSU Iba Campus' },
+                { id: 'ORD-002', customerName: 'Maria Santos', type: 'POS Counter', items: 'Graham Nest (Flavored) x10', quantity: 10, total: 120.00, status: 'Fulfilled', location: 'Walk-in' }
+            ],
+            expenses: [
+                { id: 'e1', desc: 'Initial Ingredient & Packaging Purchases', category: 'Inventory Purchases', amount: 885.00, date: '2026-10-15' },
+                { id: 'e2', desc: 'Reserved Cash / Miscellaneous Capital', category: 'Miscellaneous', amount: 115.00, date: '2026-10-15' }
+            ]
+        };
+
+        if (!localStorage.getItem('cozyCrustState')) {
+            localStorage.setItem('cozyCrustState', JSON.stringify(defaultState));
+        }
+
+        function getState() {
+            return JSON.parse(localStorage.getItem('cozyCrustState'));
+        }
+
+        function saveState(state) {
+            localStorage.setItem('cozyCrustState', JSON.stringify(state));
+            renderApp();
+        }
+    </script>
+
+    <div id="view-storefront" class="block"></div>
+    <div id="view-login" class="hidden fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center p-4 z-50"></div>
+    <div id="view-admin" class="hidden min-h-screen flex flex-col md:flex-row"></div>
+
+    <script>
+        function showView(viewId) {
+            document.getElementById('view-storefront').className = viewId === 'store' ? 'block' : 'hidden';
+            document.getElementById('view-login').className = viewId === 'login' ? 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50' : 'hidden';
+            document.getElementById('view-admin').className = viewId === 'admin' ? 'min-h-screen flex flex-col md:flex-row' : 'hidden';
+        }
+
+        function renderStorefront() {
+            const state = getState();
+            const container = document.getElementById('view-storefront');
+            container.innerHTML = `
+                <div class="bg-sage-100 text-sage-800 text-center py-2 text-xs md:text-sm font-medium tracking-wide border-b border-sage-200">
+                    A little sweetness, a little closer to home.
+                </div>
+                <header class="max-w-6xl mx-auto px-4 py-6 flex justify-between items-center">
+                    <div class="flex items-center space-x-3">
+                        <div class="bg-sage-600 text-white p-2.5 rounded-full shadow-md">🍰</div>
+                        <div>
+                            <h1 class="text-xl md:text-2xl font-bold tracking-tight text-sage-800 font-serif">The Cozy Crust</h1>
+                            <p class="text-xs text-gray-500 uppercase tracking-widest font-semibold">Sweet, Affordable Graham Nests</p>
+                        </div>
+                    </div>
+                    <button onclick="showView('login')" class="bg-sage-600 hover:bg-sage-700 text-white px-4 py-2 rounded-lg text-sm font-medium shadow-sm transition-all duration-200">
+                        Staff Login
+                    </button>
+                </header>
+
+                <main class="max-w-6xl mx-auto px-4 py-8 md:py-16 grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
+                    <div class="lg:col-span-7 space-y-6">
+                        <span class="inline-flex items-center text-xs font-semibold tracking-wider text-sage-700 uppercase bg-sage-100 px-3 py-1 rounded-full">
+                            ● Small Batch. Big Comfort.
+                        </span>
+                        <h2 class="text-4xl md:text-6xl font-black font-serif text-sage-800 leading-tight">
+                            A little nest.<br>A whole lot of<br><span class="text-sage-600 italic">happiness.</span>
+                        </h2>
+                        <p class="text-gray-600 text-base md:text-lg max-w-xl leading-relaxed">
+                            Meet your new favorite study break. Soft, creamy graham nests, made with love and filled with the flavors you crave.
+                        </p>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4">
+                            ${state.products.map(p => `
+                                <div class="bg-white border border-gray-100 p-5 rounded-2xl shadow-sm hover:shadow-md transition-all">
+                                    <div class="flex justify-between items-start mb-3">
+                                        <h4 class="font-bold text-lg text-gray-900 font-serif">${p.name}</h4>
+                                        <span class="bg-sage-50 text-sage-700 font-extrabold text-sm px-3 py-1 rounded-xl">₱${p.sellingPrice.toFixed(2)}</span>
+                                    </div>
+                                    <p class="text-xs text-gray-500">Delicious premium graham base with artisanal flavor fillings.</p>
+                                    <div class="mt-4 text-xs font-semibold ${p.stock > 0 ? 'text-emerald-600' : 'text-rose-500'}">
+                                        ● ${p.stock > 0 ? `In Stock (${p.stock} units left)` : 'Sold Out / Batch Baking'}
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+
+                    <div class="lg:col-span-5 bg-white border border-gray-100 rounded-3xl p-6 md:p-8 shadow-xl">
+                        <h3 class="text-xl font-bold text-gray-900 mb-2 font-serif">Place Your Order</h3>
+                        <p class="text-xs text-gray-500 mb-6">Instantly submits to our real-time staff sales management system counter.</p>
+                        
+                        <form id="storefront-order-form" onsubmit="handleStorefrontOrder(event)" class="space-y-4">
+                            <div>
+                                <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">Your Full Name</label>
+                                <input type="text" id="cust-name" required placeholder="e.g. Juan Dela Cruz" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-sage-600 focus:outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">Contact Number</label>
+                                <input type="tel" id="cust-phone" required placeholder="e.g. 09123456789" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-sage-600 focus:outline-none">
+                            </div>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">Select Variant</label>
+                                    <select id="cust-variant" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-3 text-sm focus:ring-2 focus:ring-sage-600 focus:outline-none">
+                                        ${state.products.map(p => `<option value="${p.id}">${p.name}</option>`).join('')}
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">Quantity (pcs)</label>
+                                    <input type="number" id="cust-qty" min="1" max="50" value="1" required class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-sage-600 focus:outline-none">
+                                </div>
+                            </div>
